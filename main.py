@@ -2,6 +2,7 @@ import gzip
 import json
 import os
 import openai
+import random
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -10,7 +11,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def extract_topics(review):
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4",
         messages=[
             {
                 "role": "system",
@@ -49,12 +50,15 @@ def print_reviews(data):
 if __name__ == "__main__":
     path = "data/AMAZON_FASHION_5.json.gz"
     data = parse(path)
-    first_entry = next(data)["reviewText"]
-    response = extract_topics(first_entry)["choices"][0]["message"]["content"]
+
+    all_reviews = list(data)
+    review = random.choice(all_reviews)["reviewText"]
+
+    response = extract_topics(review)["choices"][0]["message"]["content"]
 
     positive_topics = response.split(";")[0].split(",")
     negative_topics = response.split(";")[1].split(",")
 
-    print("Review: ", first_entry)
+    print("Review: ", review)
     print("Positive topics: ", positive_topics)
     print("Negative topics: ", negative_topics)
